@@ -70,25 +70,25 @@ function buildTrack() {
     walls.push(new Boundary(a2.x, a2.y, b2.x, b2.y));
   }
 
-  obstacles=[];
-  cp_points=[];
-  for (var i = 0; i <obstacleNo; i++) {
-  	let index = int(random(5,checkpoints.length-1));
-  	let p1 = inside[index];  	
-  	let p2 = outside[index];
-  	let mid = checkpoints[index].midpoint(); 
-  	let x = random(p1.x,p2.x);
-  	let m = (p2.y-p1.y)/(p2.x-p1.x);
-  	let y = m*(x-p1.x)+p1.y;  	
-  	let ob = new Obstacle(x,y); 	
-  	// console.log(mid);
-  	let cp_data = {  		
-  		"p1":p1,
-  		"p2":p2
-  	}
-  	cp_points.push(cp_data);
-  	obstacles.push(ob);  	
-  }  
+  obstacles = [];
+  cp_points = [];
+  for (var i = 0; i < obstacleNo; i++) {
+    let index = int(random(5, checkpoints.length - 1));
+    let p1 = inside[index];
+    let p2 = outside[index];
+    let mid = checkpoints[index].midpoint();
+    let x = random(p1.x, p2.x);
+    let m = (p2.y - p1.y) / (p2.x - p1.x);
+    let y = m * (x - p1.x) + p1.y;
+    let ob = new Obstacle(x, y);
+    // console.log(mid);
+    let cp_data = {
+      "p1": p1,
+      "p2": p2
+    }
+    cp_points.push(cp_data);
+    obstacles.push(ob);
+  }
   start = checkpoints[0].midpoint();
   end = checkpoints[checkpoints.length - 1].midpoint();
 }
@@ -101,37 +101,37 @@ function setup() {
     agents[i] = new Particle();
   }
 
-  speedSlider = createSlider(1, 10, 1);   
+  speedSlider = createSlider(1, 10, 1);
 }
 
 
-function toggle_btn(){
-	toggle_value = ! toggle_value;
-	if(toggle_value){
-		document.getElementById("btn_toggle").innerHTML = "Static";
-	}else{
-		document.getElementById("btn_toggle").innerHTML = "Dynamic";
-	}
+function toggle_btn() {
+  toggle_value = !toggle_value;
+  if (toggle_value) {
+    document.getElementById("btn_toggle").innerHTML = "Static";
+  } else {
+    document.getElementById("btn_toggle").innerHTML = "Dynamic";
+  }
 }
 async function load_model() {
-	const uploadJSONInput = document.getElementById('upload-json');
-	const uploadWeightsInput = document.getElementById('upload-weights');
-	trained_model = await tf.loadLayersModel(tf.io.browserFiles([uploadJSONInput.files[0], uploadWeightsInput.files[0]]));
-	console.log(trained_model);
+  const uploadJSONInput = document.getElementById('upload-json');
+  const uploadWeightsInput = document.getElementById('upload-weights');
+  trained_model = await tf.loadLayersModel(tf.io.browserFiles([uploadJSONInput.files[0], uploadWeightsInput.files[0]]));
+  console.log(trained_model);
 }
 
 function save_model() {
-	bestP.save()
+  bestP.save()
 }
 
 function change_obs_no() {
-	if(Number.isNaN(int(document.getElementById('obs_no').value))){
-		obstacleNo = 20;
-		console.log("nan");
-	}else{
-		obstacleNo = int(document.getElementById('obs_no').value);
-		console.log(obstacleNo);	
-	}
+  if (Number.isNaN(int(document.getElementById('obs_no').value))) {
+    obstacleNo = 20;
+    console.log("nan");
+  } else {
+    obstacleNo = int(document.getElementById('obs_no').value);
+    console.log(obstacleNo);
+  }
 }
 
 function draw() {
@@ -142,7 +142,7 @@ function draw() {
 
   for (let n = 0; n < cycles; n++) {
     for (let agent of agents) {
-      agent.look(walls,obstacles);
+      agent.look(walls, obstacles);
       agent.check(checkpoints);
       agent.bounds();
       agent.update();
@@ -196,10 +196,10 @@ function draw() {
   }
 
   for (var i = 0; i < obstacles.length; i++) {
-  	if(toggle_value){
-    	obstacles[i].show(cp_points[i]);
-    }else{
-    	obstacles[i].show(0);
+    if (toggle_value) {
+      obstacles[i].show(cp_points[i]);
+    } else {
+      obstacles[i].show(0);
     }
   }
 
@@ -213,34 +213,34 @@ function draw() {
 
   bestP.highlight();
 
-  let data = bestP.renderView(walls,obstacles);
+  let data = bestP.renderView(walls, obstacles);
   let scene = data['scene'];
   let colors = data['colors'];
   const w = 900 / scene.length;
   push();
-  translate(1000,0);
+  translate(1000, 0);
   for (var i = 0; i < scene.length; i++) {
-  	noStroke();
-  	let sq = scene[i]*scene[i];	
-  	let swq = 400*400;
-  	const b = map(sq,0,swq,200,0);
-  	const h = map(sq,0,swq,800,0);
-  	if(colors[i]==1){
-  		fill(b,0,0);
-  	}
-  	if(colors[i]==0){
-  		fill(b,b,b+30,b);	
-  	}  	
-  	rectMode(CENTER);
-  	rect(i*w + w/2,400,w+1,h);
+    noStroke();
+    let sq = scene[i] * scene[i];
+    let swq = 400 * 400;
+    const b = map(sq, 0, swq, 200, 0);
+    const h = map(sq, 0, swq, 800, 0);
+    if (colors[i] == 1) {
+      fill(b, 0, 0);
+    }
+    if (colors[i] == 0) {
+      fill(b, b, b + 30, b);
+    }
+    rectMode(CENTER);
+    rect(i * w + w / 2, 400, w + 1, h);
   }
   pop();
 
   fill(255);
-  line(trackWidth,0,trackWidth,trackheight);
+  line(trackWidth, 0, trackWidth, trackheight);
   textSize(24);
   noStroke();
   text('Generation: ' + generationCount, 10, 50);
-  text('Speed: '+ map(bestP.vel.mag().toFixed(6),0,5,0,180).toFixed(4)+ ' Km/h',10,700);
-  text('distance from obstacle: '+ bestP.closeDistFromOb.toFixed(3)+" m",10,750);
+  text('Speed: ' + map(bestP.vel.mag().toFixed(6), 0, 5, 0, 180).toFixed(4) + ' px/s', 10, 700);
+  text('distance from obstacle: ' + bestP.closeDistFromOb.toFixed(3) + " px", 10, 750);
 }
